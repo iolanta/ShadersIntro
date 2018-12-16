@@ -5,19 +5,27 @@
 #include <cmath>
 #include <utility>
 #include <iostream>
-#include "OBJ_Loader.h"
+
+#include <glm/gtc/matrix_inverse.hpp>
+
+
+
+#include "GLShader.h"
+#include "GLobject.h"
 
 
 int w = 0, h = 0;
+
+GLShader * shaderwrap;
+GLobject * objectwrap;
+
+
 
 void Init(void)
 {
 	glClearColor(0, 0, 0, 1.0f);
 
-	glEnable(GL_COLOR_MATERIAL);
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	
-	glLightModelf(GL_LIGHT_MODEL_TWO_SIDE, 0);
+
 
 }
 
@@ -29,12 +37,6 @@ void Reshape(int x, int y)
 	h = y;
 
 	glViewport(0, 0, w, h);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(90, (GLdouble)w / h, 0.05, 300);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	gluLookAt(-5, 0, 0, 0, 0, 0, 0, 0, 1);
 
 }
 
@@ -43,6 +45,11 @@ void Reshape(int x, int y)
 void Update(void) {
 	glMatrixMode(GL_MODELVIEW);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+
+
+	glFlush();
+	glutSwapBuffers();
 
 }
 
@@ -80,6 +87,13 @@ int main(int argc, char **argv)
 
 	}
 	Init();
+
+	shaderwrap = new GLShader();
+	objectwrap = new GLobject("cat.obj");
+
+
 	glutMainLoop();
+
+
 	return 0;         
 }

@@ -9,7 +9,8 @@ ShaderData::ShaderData(GLuint sh, GLenum type) {
 
 VariableData::VariableData() {}
 
-VariableData::VariableData(std::string n, GLenum t, GLsizei sz) {
+VariableData::VariableData(GLint  l, std::string n, GLenum t, GLsizei sz) {
+	location = l;
 	VariableData::name = n;
 	VariableData::type = t;
 	VariableData::size = sz;
@@ -39,16 +40,80 @@ GLShader::~GLShader()
 	delete attached;
 	glDeleteProgram(ShaderProgram);
 
-	for (int i = 0; i < shaders.count; ++i) {
+	for (int i = 0; i < shaders.size(); ++i) {
 		glDeleteShader(shaders[i].shader);
 	}
 }
 
-int GLShader::load_shader(std::string filename, GLenum shader_type) {
+bool GLShader::load_shader(std::string filename, GLenum shader_type) {
 	GLuint s = compileSource(filename, shader_type);
 	ShaderData sd = ShaderData(s, shader_type);
 	shaders.insert(std::pair<int, ShaderData>(shader_count, sd));
 	++shader_count;
+	return true;
+}
+
+bool GLShader::setUniformfv4(std::string name, const GLfloat * vec4)
+{
+	auto vd = uniforms.find(name);
+	if (vd == uniforms.end())
+		return false; // no such uniform
+	if (vd->second.type != GL_FLOAT_VEC4)
+		return false; // type error
+	glUniform4fv(vd->second.location, 1, vec4);
+	return true;
+}
+
+bool GLShader::setUniformfv3(std::string name, const GLfloat * vec3)
+{
+	auto vd = uniforms.find(name);
+	if (vd == uniforms.end())
+		return false; // no such uniform
+	if (vd->second.type != GL_FLOAT_VEC3)
+		return false; // type error
+	glUniform3fv(vd->second.location, 1, vec3);
+	return true;
+}
+
+bool GLShader::setUniformfv2(std::string name, const GLfloat * vec2)
+{
+	auto vd = uniforms.find(name);
+	if (vd == uniforms.end())
+		return false; // no such uniform
+	if (vd->second.type != GL_FLOAT_VEC2)
+		return false; // type error
+	glUniform2fv(vd->second.location, 1, vec2);
+	return true;
+}
+
+bool GLShader::setUniformmat4(std::string name, bool transpose, const GLfloat * mat4)
+{
+	auto vd = uniforms.find(name);
+	if (vd == uniforms.end())
+		return false; // no such uniform
+	if (vd->second.type != GL_FLOAT_MAT4)
+		return false; // type error
+	glUniformMatrix4fv(vd->second.location, 1,transpose, mat4);
+	return true;
+}
+
+bool GLShader::setUniform1i(std::string name, const GLint value)
+{
+	auto vd = uniforms.find(name);
+	if (vd == uniforms.end())
+		return false; // no such uniform
+	if (vd->second.type != GL_INT)
+		return false; // type error
+	glUniform1i(vd->second.location, value);
+	return true;
+}
+
+GLint GLShader::getAttributeLocation(std::string name)
+{
+	auto vd = attributes.find(name);
+	if (vd == attributes.end())
+		return -1; // no such attribute
+	return vd->second.location;
 }
 
 std::string GLShader::loadSourceFile(const std::string& source_file_name) {
@@ -110,6 +175,8 @@ void GLShader::linkProgram(int vertex_id, int fragment_id) {
 	}
 
 	int count_attributes, max_length;
+	attributes.clear();
+	uniforms.clear();
 	glGetProgramiv(ShaderProgram, GL_ACTIVE_ATTRIBUTES, &count_attributes);
 	glGetProgramiv(ShaderProgram, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &max_length);
 	char* name = new char[max_length]; 
@@ -119,9 +186,27 @@ void GLShader::linkProgram(int vertex_id, int fragment_id) {
 		glGetActiveAttrib(ShaderProgram, i, max_length, NULL, &size, &type, name);
 
 		std::string sname = std::string(name);
-		VariableData vb(sname, type, size);
+		VariableData vb(i,sname, type, size);
 		attributes.insert(std::pair<std::string, VariableData>(sname, vb));
 	}
+	delete name;
+
+
+	glGetProgramiv(ShaderProgram, GL_ACTIVE_UNIFORMS, &count_attributes);
+	glGetProgramiv(ShaderProgram, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_length);
+	name = new char[max_length];
+	for (int i = 0; i < count_attributes; ++i) {
+		int size;
+		GLenum type;
+		glGetActiveUniform(ShaderProgram, i, max_length, NULL, &size, &type, name);
+
+		std::string sname = std::string(name);
+		VariableData vb(i,sname, type, size);
+		uniforms.insert(std::pair<std::string, VariableData>(sname, vb));
+	}
+	delete name;
+
+
 }
 
 void GLShader::checkOpenGLerror()
