@@ -4,7 +4,8 @@ uniform vec3 color;
 in vec3 normf;
 in vec2 texcoordf;
 in vec3 colorf;
+out vec4 fragColor;
 
 void main(){
-	gl_FragColor = color;
+	fragColor = color;
 }
