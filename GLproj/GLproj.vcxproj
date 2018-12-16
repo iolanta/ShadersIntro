@@ -153,10 +153,12 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GLobject.cpp" />
     <ClCompile Include="GLShader.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GLobject.h" />
     <ClInclude Include="GLShader.h" />
     <ClInclude Include="OBJ_Loader.h" />
   </ItemGroup>
