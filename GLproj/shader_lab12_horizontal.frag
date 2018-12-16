@@ -10,7 +10,7 @@ out vec4 fragColor;
 
 void main(){
 	if(mod(gl_FragCoord.y, width / 2) < width)
-		fragColor = color1;
+		fragColor = vec4(color1, 1.0);
 	else
-		fragColor = color2;
+		fragColor = vec4(color2,1.0);
 }
