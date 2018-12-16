@@ -1,4 +1,7 @@
 #include "GLShader.h"
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 ShaderData::ShaderData(){}
 
@@ -53,49 +56,52 @@ int GLShader::load_shader(std::string filename, GLenum shader_type) {
 	
 }
 
-bool GLShader::setUniformfv4(std::string name, const GLfloat * vec4)
+bool GLShader::setUniformfv4(std::string name, glm::vec4 v)
 {
 	auto vd = uniforms.find(name);
 	if (vd == uniforms.end())
 		return false; // no such uniform
 	if (vd->second.type != GL_FLOAT_VEC4)
 		return false; // type error
-	glUniform4fv(vd->second.location, 1, vec4);
+	glUniform4fv(vd->second.location, 1, glm::value_ptr(v));
 	return true;
 }
 
-bool GLShader::setUniformfv3(std::string name, const GLfloat * vec3)
+bool GLShader::setUniformfv3(std::string name, glm::vec3 v)
 {
 	auto vd = uniforms.find(name);
 	if (vd == uniforms.end())
 		return false; // no such uniform
 	if (vd->second.type != GL_FLOAT_VEC3)
 		return false; // type error
-	glUniform3fv(vd->second.location, 1, vec3);
+	glUniform3fv(vd->second.location, 1, glm::value_ptr(v));
 	return true;
 }
 
-bool GLShader::setUniformfv2(std::string name, const GLfloat * vec2)
+bool GLShader::setUniformfv2(std::string name, glm::vec2 v)
 {
 	auto vd = uniforms.find(name);
 	if (vd == uniforms.end())
 		return false; // no such uniform
 	if (vd->second.type != GL_FLOAT_VEC2)
 		return false; // type error
-	glUniform2fv(vd->second.location, 1, vec2);
+	glUniform2fv(vd->second.location, 1, glm::value_ptr(v));
 	return true;
 }
 
-bool GLShader::setUniformmat4(std::string name, bool transpose, const GLfloat * mat4)
+bool GLShader::setUniformmat4(std::string name, bool transpose, glm::mat4 mat4)
 {
 	auto vd = uniforms.find(name);
 	if (vd == uniforms.end())
 		return false; // no such uniform
 	if (vd->second.type != GL_FLOAT_MAT4)
 		return false; // type error
-	glUniformMatrix4fv(vd->second.location, 1,transpose, mat4);
+	glUniformMatrix4fv(vd->second.location, 1,transpose, glm::value_ptr(mat4));
 	return true;
 }
+
+
+
 
 bool GLShader::setUniform1i(std::string name, const GLint value)
 {
@@ -184,9 +190,9 @@ void GLShader::linkProgram(int vertex_id, int fragment_id) {
 		int size;
 		GLenum type;
 		glGetActiveAttrib(ShaderProgram, i, max_length, NULL, &size, &type, name);
-
+		auto Loc = glGetAttribLocation(ShaderProgram, name);
 		std::string sname = std::string(name);
-		VariableData vb(i,sname, type, size);
+		VariableData vb(Loc,sname, type, size);
 		attributes.insert(std::pair<std::string, VariableData>(sname, vb));
 	}
 	delete name;
@@ -199,9 +205,9 @@ void GLShader::linkProgram(int vertex_id, int fragment_id) {
 		int size;
 		GLenum type;
 		glGetActiveUniform(ShaderProgram, i, max_length, NULL, &size, &type, name);
-
+		auto Loc = glGetUniformLocation(ShaderProgram, name);
 		std::string sname = std::string(name);
-		VariableData vb(i,sname, type, size);
+		VariableData vb(Loc,sname, type, size);
 		uniforms.insert(std::pair<std::string, VariableData>(sname, vb));
 	}
 	delete name;

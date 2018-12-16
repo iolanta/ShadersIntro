@@ -6,9 +6,8 @@
 #include <utility>
 #include <iostream>
 #include <vector>
-#include <glm/gtc/matrix_inverse.hpp>
-
-
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "GLShader.h"
 #include "GLobject.h"
@@ -21,11 +20,33 @@ GLobject * objectwrap;
 
 std::vector<int> VertShaders;
 std::vector<int> FragShaders;
+glm::mat4 Matrix_projection;
+
+float rotateX = 0;
+float rotateY = 0;
+float scaleX = 1;
+float scaleY = 1;
+
+
+std::vector<std::string> pathsVert = {
+"shader_lab12.vert"
+};
+
+std::vector<std::string> pathsFrag = {
+"shader_lab12.frag",
+"shader_lab12_horizontal.frag",
+"shader_lab12_vertical.frag",
+"shader_lab12_tex.frag",
+"shader_lab12_texcolor.frag",
+"shader_lab12_twotex.frag",
+};
+
+
 
 void Init(void)
 {
 	glClearColor(0, 0, 0, 1.0f);
-
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 
 }
@@ -36,8 +57,16 @@ void Reshape(int x, int y)
 
 	w = x;
 	h = y;
-
 	glViewport(0, 0, w, h);
+
+	Matrix_projection = glm::perspective(80.0f, (float)w / h, 0.01f, 200.0f);
+	glm::vec3 eye = {5,0,0};
+	glm::vec3 center = { 0,0,0 };
+	glm::vec3 up = { 0,0,1};
+
+	Matrix_projection  *= glm::lookAt(eye,center,up);
+
+	
 
 }
 
@@ -46,6 +75,20 @@ void Reshape(int x, int y)
 void Update(void) {
 	glMatrixMode(GL_MODELVIEW);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	glUseProgram(shaderwrap->ShaderProgram);
+	
+
+	glm::mat4 transfor = glm::scale(Matrix_projection, glm::vec3{ scaleX,scaleY,1 });
+	transfor = glm::rotate(transfor, rotateX, glm::vec3( 1,0,0 ));
+	transfor = glm::rotate(transfor, rotateY, glm::vec3(0, 1, 0));
+	shaderwrap->setUniformmat4("transf",false, transfor);	
+	
+	shaderwrap->setUniformfv3("color", glm::vec3 { 1,0,0 });
+
+	objectwrap->drawObject();
+
+	glUseProgram(0);
 	
 
 
@@ -56,27 +99,51 @@ void Update(void) {
 
 void keyboard(unsigned char key, int x, int y)	
 {
+	switch (key)
+	{
+	case 'w':
+		rotateX += 0.1;
+		break;
+	case 's':
+		rotateX -= 0.1;
+		break;
+	case 'a':
+		rotateY -= 0.1;
+		break;
+	case 'd':
+		rotateY += 0.1;
+		break;
+	default:
+		break;
+	}
+
 	glutPostRedisplay();
 }
 
 void specialKeys(int key, int x, int y) {
+	switch (key)
+	{
+	case GLUT_KEY_UP:
+		scaleX += 0.1;
+		break;
+	case GLUT_KEY_DOWN:
+		scaleX -= 0.1;
+		break;
+	case GLUT_KEY_LEFT:
+		scaleY -= 0.1;
+		break;
+	case GLUT_KEY_RIGHT:
+		scaleY += 0.1;
+		break;
+	default:
+		break;
+	}
 	glutPostRedisplay();
 }
 
 
 void LoadShaders() {
-	std::vector<std::string> pathsVert =  {
-	"shader_lab12.vert"
-	};
 
-	std::vector<std::string> pathsFrag = {
-	"shader_lab12.frag",
-	"shader_lab12_horizontal.frag",
-	"shader_lab12_vertical.frag",
-	"shader_lab12_tex.frag",
-	"shader_lab12_texcolor.frag",
-	"shader_lab12_twotex.frag",
-	};
 
 
 	for (size_t i = 0; i < pathsVert.size(); i++)
@@ -121,6 +188,14 @@ int main(int argc, char **argv)
 	objectwrap = new GLobject("cat.obj");
 
 	LoadShaders();
+	shaderwrap->linkProgram(VertShaders[0], FragShaders[0]);
+
+	
+
+	objectwrap->BindAttributesToShader(*shaderwrap);
+	
+	shaderwrap->checkOpenGLerror();
+
 	glutMainLoop();
 
 

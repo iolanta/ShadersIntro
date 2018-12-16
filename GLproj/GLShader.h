@@ -7,6 +7,7 @@
 #include <sstream>
 #include <fstream>
 #include <map>
+#include <glm/mat4x4.hpp>
 
 class ShaderData {
 public:
@@ -36,17 +37,19 @@ public:
 
 	int load_shader(std::string filename, GLenum shader_type);
 
-	bool setUniformfv4(std::string name, const GLfloat  * vec4);
-	bool setUniformfv3(std::string name,  const  GLfloat  * vec3);
-	bool setUniformfv2(std::string name,  const   GLfloat  *vec2);
-	bool setUniformmat4(std::string name, bool transpose,   const GLfloat * mat);
+	bool setUniformfv4(std::string name, glm::vec4 v);
+	bool setUniformfv3(std::string name,  glm::vec3 v);
+	bool setUniformfv2(std::string name, glm::vec2 v);
+	bool setUniformmat4(std::string name, bool transpose, glm::mat4 mat4);
 	bool setUniform1i(std::string name,  const GLint value);
 
 	GLint getAttributeLocation(std::string name);
 
-
-private:
+	void linkProgram(int vertex_id, int fragment_id);
 	GLuint ShaderProgram;
+
+	void checkOpenGLerror();
+private:
 	int shader_count;
 
 	std::map<int, ShaderData> shaders;
@@ -59,9 +62,9 @@ private:
 
 	void printInfoLogShader(GLuint shader);
 
-	void linkProgram(int vertex_id, int fragment_id);
+	
 
-	void checkOpenGLerror();
+	
 
 
 
