@@ -1,4 +1,4 @@
-#version 4605
+#version 410
 
 uniform int width;
 uniform vec3 color1;
@@ -8,7 +8,7 @@ in vec2 texcoordf;
 in vec3 colorf;
 
 void main(){
-	if(mod(gl_FragCoord.y, width / 2) < width)
+	if(mod(gl_FragCoord.x, width / 2) < width)
 		gl_FragColor = color1;
 	else
 		gl_FragColor = color2;

@@ -34,7 +34,7 @@ public:
 	GLShader();
 	~GLShader();
 
-	bool load_shader(std::string filename, GLenum shader_type);
+	int load_shader(std::string filename, GLenum shader_type);
 
 	bool setUniformfv4(std::string name, const GLfloat  * vec4);
 	bool setUniformfv3(std::string name,  const  GLfloat  * vec3);

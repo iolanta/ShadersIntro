@@ -1,4 +1,4 @@
-#version 4605
+#version 410
 
 uniform matr4 transforms;
 attribute vec4 coord;

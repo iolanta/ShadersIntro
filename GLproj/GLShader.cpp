@@ -45,12 +45,12 @@ GLShader::~GLShader()
 	}
 }
 
-bool GLShader::load_shader(std::string filename, GLenum shader_type) {
+int GLShader::load_shader(std::string filename, GLenum shader_type) {
 	GLuint s = compileSource(filename, shader_type);
 	ShaderData sd = ShaderData(s, shader_type);
 	shaders.insert(std::pair<int, ShaderData>(shader_count, sd));
-	++shader_count;
-	return true;
+	return shader_count++;
+	
 }
 
 bool GLShader::setUniformfv4(std::string name, const GLfloat * vec4)

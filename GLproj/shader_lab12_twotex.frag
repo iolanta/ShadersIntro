@@ -1,5 +1,4 @@
-#version 4605
-
+#version 410
 in vec3 normf;
 in vec2 texcoordf;
 in vec3 colorf;

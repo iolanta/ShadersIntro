@@ -1,4 +1,4 @@
-#version 4605
+#version 410
 
 uniform vec3 color;
 in vec3 normf;
