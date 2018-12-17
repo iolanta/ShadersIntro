@@ -40,9 +40,9 @@ GLobject::GLobject(std::string path)
 		mapped_data[ind++] = modelloader.LoadedVertices[i].Normal.Z;
 		mapped_data[ind++] = modelloader.LoadedVertices[i].TextureCoordinate.X;
 		mapped_data[ind++] = modelloader.LoadedVertices[i].TextureCoordinate.Y;
-		mapped_data[ind++] = 0;
-		mapped_data[ind++] = 0;
-		mapped_data[ind++] = 0;
+		mapped_data[ind++] = 0.8;
+		mapped_data[ind++] = 0.5;
+		mapped_data[ind++] = 0.3;
 		
 	}
 	glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -68,8 +68,8 @@ bool GLobject::BindAttributesToShader(GLShader & shaderobject)
 	GLint NormAttrib = shaderobject.getAttributeLocation("norm");
 
 	GLint TexCoordAttrib = shaderobject.getAttributeLocation("texcoord");
-	GLint ColorAttriv = shaderobject.getAttributeLocation("color");
-	if (CoordAttrib == -1 || NormAttrib == -1 || TexCoordAttrib == -1 || CoordAttrib == -1)
+	GLint ColorAttrib = shaderobject.getAttributeLocation("color");
+	if (CoordAttrib == -1 || NormAttrib == -1 || TexCoordAttrib == -1 || ColorAttrib == -1)
 	{
 		//glBindVertexArray(0);
 		//return false;
@@ -80,15 +80,15 @@ bool GLobject::BindAttributesToShader(GLShader & shaderobject)
 	}
 	if (NormAttrib != -1) {
 		glEnableVertexAttribArray(NormAttrib);
-		glVertexAttribPointer(NormAttrib, 3, GL_FLOAT, GL_TRUE, stride, BUFFER_OFFSET(sizeof(GLfloat)+4));
+		glVertexAttribPointer(NormAttrib, 3, GL_FLOAT, GL_TRUE, stride, BUFFER_OFFSET(sizeof(GLfloat)*4));
 	}
 	if (TexCoordAttrib != -1) {
 		glEnableVertexAttribArray(TexCoordAttrib);
-		glVertexAttribPointer(TexCoordAttrib, 2, GL_FLOAT, GL_FALSE, stride, BUFFER_OFFSET(sizeof(GLfloat) + 7));
+		glVertexAttribPointer(TexCoordAttrib, 2, GL_FLOAT, GL_FALSE, stride, BUFFER_OFFSET(sizeof(GLfloat)* 7));
 	}
-	if (ColorAttriv != -1){
-		glEnableVertexAttribArray(ColorAttriv);
-		glVertexAttribPointer(ColorAttriv, 3, GL_FLOAT, GL_TRUE, stride, BUFFER_OFFSET(sizeof(GLfloat) + 9));
+	if (ColorAttrib != -1){
+		glEnableVertexAttribArray(ColorAttrib);
+		glVertexAttribPointer(ColorAttrib, 3, GL_FLOAT, GL_TRUE, stride, BUFFER_OFFSET(sizeof(GLfloat)* 9));
 	}
 
 	glBindVertexArray(0);

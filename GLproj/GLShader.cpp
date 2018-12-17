@@ -108,9 +108,20 @@ bool GLShader::setUniform1i(std::string name, const GLint value)
 	auto vd = uniforms.find(name);
 	if (vd == uniforms.end())
 		return false; // no such uniform
-	if (vd->second.type != GL_INT)
-		return false; // type error
+//	if (vd->second.type != GL_INT)
+//		return false; // type error
 	glUniform1i(vd->second.location, value);
+	return true;
+}
+
+bool GLShader::setUniform1f(std::string name, const GLfloat value)
+{
+	auto vd = uniforms.find(name);
+	if (vd == uniforms.end())
+		return false; // no such uniform
+	if (vd->second.type != GL_FLOAT)
+		return false; // type error
+	glUniform1f(vd->second.location, value);
 	return true;
 }
 

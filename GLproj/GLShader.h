@@ -42,6 +42,7 @@ public:
 	bool setUniformfv2(std::string name, glm::vec2 v);
 	bool setUniformmat4(std::string name, bool transpose, glm::mat4 mat4);
 	bool setUniform1i(std::string name,  const GLint value);
+	bool setUniform1f(std::string name, const GLfloat value);
 
 	GLint getAttributeLocation(std::string name);
 
